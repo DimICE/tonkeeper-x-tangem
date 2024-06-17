@@ -133,6 +133,8 @@ class InitViewModel(
     private fun startWalletFlow() {
         if (type == InitArgs.Type.Watch) {
             _eventFlow.tryEmit(InitEvent.Step.WatchAccount)
+        } else if (type == InitArgs.Type.Tangem) {
+            _eventFlow.tryEmit(InitEvent.Step.TangemAccount)
         } else if (type == InitArgs.Type.New) {
             _eventFlow.tryEmit(InitEvent.Step.LabelAccount)
         } else if (type == InitArgs.Type.Import || type == InitArgs.Type.Testnet) {
@@ -179,6 +181,14 @@ class InitViewModel(
 
     fun setPublicKey(publicKey: PublicKeyEd25519?) {
         savedState.publicKey = publicKey
+    }
+
+    suspend fun setTangemPublicKey(tangemCardId: String, tangemPublicKey: ByteArray, publicKey: PublicKeyEd25519) {
+        resolveWallets(publicKey)
+        savedState.publicKey = publicKey
+        savedState.tangemCardId = tangemCardId
+        savedState.tangemPublicKey = tangemPublicKey
+        savedState.mnemonic = listOf("tangem")
     }
 
     private suspend fun resolveWallets(mnemonic: List<String>) = withContext(Dispatchers.IO) {
@@ -353,6 +363,7 @@ class InitViewModel(
                     InitArgs.Type.Watch -> wallets.add(saveWatchWallet())
                     InitArgs.Type.New -> wallets.add(accountRepository.addNewWallet(getLabel()))
                     InitArgs.Type.Import, InitArgs.Type.Testnet -> wallets.addAll(importWallet())
+                    InitArgs.Type.Tangem -> wallets.addAll(importTangemWallet())
                     InitArgs.Type.Signer -> wallets.addAll(signerWallets(false))
                     InitArgs.Type.SignerQR -> wallets.addAll(signerWallets(true))
                 }
@@ -379,6 +390,16 @@ class InitViewModel(
         val publicKey = getPublicKey(account.address)
 
         return accountRepository.addWatchWallet(label, publicKey, account.walletVersion)
+    }
+
+    private suspend fun importTangemWallet(): List<WalletEntity> {
+        val versions = getSelectedAccounts().map { it.walletVersion }
+        val publicKey = savedState.publicKey ?: throw IllegalStateException("publicKey is not set")
+        val tangemCardId = savedState.tangemCardId ?: throw IllegalStateException("tangemCardId is not set")
+        val tangemPublicKey = savedState.tangemPublicKey ?: throw IllegalStateException("tangemPublicKey is not set")
+        val label = getLabel()
+
+        return accountRepository.addTangemWallet(label, publicKey, versions, tangemCardId, tangemPublicKey)
     }
 
     private suspend fun importWallet(): List<WalletEntity> {

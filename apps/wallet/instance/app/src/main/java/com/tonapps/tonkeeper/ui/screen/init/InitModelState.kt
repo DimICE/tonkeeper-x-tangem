@@ -17,6 +17,8 @@ class InitModelState(private val savedStateHandle: SavedStateHandle) {
         private const val MNEMONIC_KEY = "mnemonic"
         private const val ACCOUNTS = "accounts"
         private const val PUBLIC_KEY = "public_key"
+        private const val TANGEM_CARD_ID = "tangem_card_id"
+        private const val TANGEM_PUBLIC_KEY = "tangem_public_key"
     }
 
     var passcode: String?
@@ -45,4 +47,12 @@ class InitModelState(private val savedStateHandle: SavedStateHandle) {
             return value.safePublicKey()
         }
         set(value) = savedStateHandle.set(PUBLIC_KEY, value?.base64())
+
+    var tangemCardId: String?
+        get() = savedStateHandle[TANGEM_CARD_ID]
+        set(value) = savedStateHandle.set(TANGEM_CARD_ID, value)
+
+    var tangemPublicKey: ByteArray?
+        get() = savedStateHandle[TANGEM_PUBLIC_KEY]
+        set(value) = savedStateHandle.set(TANGEM_PUBLIC_KEY, value)
 }

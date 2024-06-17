@@ -16,7 +16,9 @@ data class WalletEntity(
     val publicKey: PublicKeyEd25519,
     val type: Wallet.Type,
     val version: WalletVersion = WalletVersion.V4R2,
-    val label: Wallet.Label
+    val label: Wallet.Label,
+    val tangemCardId: String? = null,
+    val tangemPublicKey: ByteArray? = null,
 ) {
 
     companion object {

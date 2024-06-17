@@ -9,6 +9,7 @@ import com.tonapps.tonkeeper.ui.screen.init.step.PushScreen
 import com.tonapps.tonkeeper.ui.screen.init.step.SelectScreen
 import com.tonapps.tonkeeper.ui.screen.init.step.WatchScreen
 import com.tonapps.tonkeeper.ui.screen.init.step.WordsScreen
+import com.tonapps.tonkeeper.ui.screen.init.step.TangemScreen
 import com.tonapps.tonkeeperx.R
 import com.tonapps.uikit.color.backgroundPageColor
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -73,6 +74,7 @@ class InitScreen: BaseFragment(R.layout.fragment_init), BaseFragment.SwipeBack {
             InitEvent.Step.ReEnterPasscode -> PasscodeScreen.newInstance(true)
             InitEvent.Step.ImportWords -> WordsScreen.newInstance(false)
             InitEvent.Step.WatchAccount -> WatchScreen.newInstance()
+            InitEvent.Step.TangemAccount -> TangemScreen.newInstance(false)
             InitEvent.Step.LabelAccount -> LabelScreen.newInstance()
             InitEvent.Step.SelectAccount -> SelectScreen.newInstance()
             InitEvent.Step.Push -> PushScreen.newInstance()

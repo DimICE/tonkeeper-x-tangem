@@ -1,8 +1,13 @@
 package com.tonapps.tonkeeper.ui.screen.send
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.tangem.TangemSdk
+import com.tangem.common.CompletionResult
+import com.tangem.crypto.hdWallet.DerivationPath
+import com.tangem.sdk.extensions.init
 import com.tonapps.blockchain.ton.extensions.EmptyPrivateKeyEd25519
 import com.tonapps.blockchain.ton.extensions.isValidTonAddress
 import com.tonapps.extensions.MutableEffectFlow
@@ -48,6 +53,7 @@ import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.ton.bitstring.BitString
+import uikit.extensions.activity
 import java.math.RoundingMode
 
 @OptIn(FlowPreview::class)
@@ -326,6 +332,29 @@ class SendViewModel(
             when (wallet.type) {
                 Wallet.Type.Signer -> _uiEventFlow.tryEmit(SendEvent.Signer(unsignedBody, wallet.publicKey))
                 Wallet.Type.Watch -> throw SendException.UnableSendTransaction()
+                Wallet.Type.Tangem -> {
+                    val hash = unsignedBody.hash()
+                    // подписать unsignedBody
+                    viewModelScope.launch (Dispatchers.Main) {
+                        val tangemSdk = TangemSdk.init(context.activity!!)
+                        tangemSdk.sign(
+                            hash = hash,
+                            cardId = wallet.tangemCardId,
+                            walletPublicKey = wallet.tangemPublicKey!!,
+                            derivationPath = DerivationPath(rawPath = "m/44'/607'/0'") // TON
+                        ) { result ->
+                            when (result) {
+                                is CompletionResult.Success -> {
+                                    viewModelScope.launch (Dispatchers.IO) {
+                                        send(BitString(result.data.signature), transfer)
+                                    }
+                                }
+                                is CompletionResult.Failure -> {
+                                }
+                            }
+                        }
+                    }
+                }
                 else -> {
                     val isValidPasscode = passcodeRepository.confirmation(context)
                     if (!isValidPasscode) {

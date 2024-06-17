@@ -16,6 +16,7 @@ class ImportWalletDialog(context: Context): BaseSheetDialog(context), View.OnCli
         private val associatedActions = mapOf(
             R.id.import_wallet to InitArgs.Type.Import,
             R.id.watch_wallet to InitArgs.Type.Watch,
+            R.id.tangem_wallet to InitArgs.Type.Tangem,
             R.id.testnet_wallet to InitArgs.Type.Testnet,
             R.id.signer_wallet to InitArgs.Type.Signer,
         )
@@ -28,6 +29,7 @@ class ImportWalletDialog(context: Context): BaseSheetDialog(context), View.OnCli
 
         findViewById<View>(R.id.import_wallet)!!.setOnClickListener(this)
         findViewById<View>(R.id.watch_wallet)!!.setOnClickListener(this)
+        findViewById<View>(R.id.tangem_wallet)!!.setOnClickListener(this)
         findViewById<View>(R.id.testnet_wallet)!!.setOnClickListener(this)
 
         val signerView = findViewById<View>(R.id.signer_wallet)!!
