@@ -25,6 +25,8 @@ import com.tonapps.wallet.data.events.eventsModule
 import com.tonapps.wallet.data.push.pushModule
 import com.tonapps.wallet.data.rn.rnLegacyModule
 import com.tonapps.wallet.data.tonconnect.tonConnectModule
+import io.appmetrica.analytics.AppMetrica
+import io.appmetrica.analytics.AppMetricaConfig
 import org.koin.core.component.KoinComponent
 
 class App: Application(), CameraXConfig.Provider, KoinComponent {
@@ -49,6 +51,11 @@ class App: Application(), CameraXConfig.Provider, KoinComponent {
 
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         initFresco()
+
+        // Creating an extended library configuration.
+        val config = AppMetricaConfig.newConfigBuilder("715217e0-8181-421c-ab93-904345d31a2a").build()
+        // Initializing the AppMetrica SDK.
+        AppMetrica.activate(this, config)
     }
 
     private fun initFresco() {

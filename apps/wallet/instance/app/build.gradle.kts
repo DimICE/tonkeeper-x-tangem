@@ -109,4 +109,5 @@ dependencies {
 
     implementation("com.github.tangem.tangem-sdk-android:android:3.9.1")
     implementation("com.github.tangem.tangem-sdk-android:core:3.9.1")
+    implementation("io.appmetrica.analytics:analytics:6.5.0")
 }
