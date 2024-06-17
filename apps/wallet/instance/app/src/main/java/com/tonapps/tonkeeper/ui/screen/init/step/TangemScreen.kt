@@ -9,6 +9,7 @@ import androidx.lifecycle.lifecycleScope
 import com.tangem.TangemSdk
 import com.tangem.common.CompletionResult
 import com.tangem.common.card.Card
+import com.tangem.common.card.EllipticCurve
 import com.tangem.common.core.CardSession
 import com.tangem.common.core.CardSessionRunnable
 import com.tangem.common.core.CompletionCallback
@@ -78,20 +79,27 @@ class TangemScreen: BaseFragment(R.layout.fragment_init_tangem) {
                         ScanTask().run(session) { scanResult ->
                             when (scanResult) {
                                 is CompletionResult.Success -> {
+                                    var walletPublicKey: ByteArray? = null
                                     val cardId = scanResult.data.cardId
-                                    val walletPublicKey = scanResult.data.wallets[4].publicKey
-                                    val command = DeriveWalletPublicKeyTask(walletPublicKey, DerivationPath(rawPath = "m/44'/607'/0'"))
-                                    command.run(session) { deriveResult ->
-                                        when (deriveResult) {
-                                            is CompletionResult.Success -> {
-                                                callback(CompletionResult.Success(Triple(cardId, walletPublicKey, deriveResult.data)))
-                                            }
-
-                                            is CompletionResult.Failure -> {
-                                                callback(CompletionResult.Failure(deriveResult.error))
-                                            }
+                                    scanResult.data.wallets.forEach { wallet ->
+                                        if (wallet.curve == EllipticCurve.Ed25519Slip0010) {
+                                            walletPublicKey = wallet.publicKey
                                         }
                                     }
+                                    walletPublicKey?.let {
+                                        val command = DeriveWalletPublicKeyTask(it, DerivationPath(rawPath = "m/44'/607'/0'"))
+                                        command.run(session) { deriveResult ->
+                                            when (deriveResult) {
+                                                is CompletionResult.Success -> {
+                                                    callback(CompletionResult.Success(Triple(cardId, it, deriveResult.data)))
+                                                }
+
+                                                is CompletionResult.Failure -> {
+                                                    callback(CompletionResult.Failure(deriveResult.error))
+                                                }
+                                            }
+                                        }
+                                    } ?: callback(CompletionResult.Failure(TangemSdkError.WalletNotFound()))
                                 }
 
                                 is CompletionResult.Failure -> {
