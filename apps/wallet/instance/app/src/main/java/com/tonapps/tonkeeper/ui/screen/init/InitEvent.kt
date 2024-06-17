@@ -10,6 +10,7 @@ sealed class InitEvent {
         object ReEnterPasscode: Step()
         object ImportWords: Step()
         object WatchAccount: Step()
+        object TangemAccount: Step()
         object LabelAccount: Step()
         object SelectAccount: Step()
         object Push: Step()

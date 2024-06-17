@@ -79,6 +79,7 @@ class WalletHolder(
             Wallet.Type.Watch -> Localization.watch_only
             Wallet.Type.Testnet -> Localization.testnet
             Wallet.Type.Signer -> Localization.signer
+            Wallet.Type.Tangem -> Localization.tangem
             else -> throw IllegalArgumentException("Unknown wallet type: $type")
         }
         typeView.setText(resId)

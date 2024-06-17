@@ -53,6 +53,15 @@
                 android:subtitle="@string/watch_wallet_subtitle"/>
 
             <uikit.widget.ActionCellView
+                android:id="@+id/tangem_wallet"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/offsetMedium"
+                android:icon="@drawable/ic_label_back_card"
+                android:title="@string/tangem_wallet"
+                android:subtitle="@string/tangem_wallet_subtitle"/>
+
+            <uikit.widget.ActionCellView
                 android:id="@+id/testnet_wallet"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

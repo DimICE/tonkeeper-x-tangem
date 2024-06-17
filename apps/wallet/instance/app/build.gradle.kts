@@ -106,4 +106,7 @@ dependencies {
         exclude(group = "com.facebook.fresco", module = "memory-type-native")
         exclude(group = "com.facebook.fresco", module = "imagepipeline-native")
     }
+
+    implementation("com.github.tangem.tangem-sdk-android:android:3.9.1")
+    implementation("com.github.tangem.tangem-sdk-android:core:3.9.1")
 }

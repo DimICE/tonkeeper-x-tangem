@@ -32,6 +32,7 @@ class AddScreen: BaseFragment(R.layout.fragment_add_wallet), BaseFragment.Modal 
         openByClick(R.id.new_wallet, InitArgs.Type.New)
         openByClick(R.id.import_wallet, InitArgs.Type.Import)
         openByClick(R.id.watch_wallet, InitArgs.Type.Watch)
+        openByClick(R.id.tangem_wallet, InitArgs.Type.Tangem)
         openByClick(R.id.testnet_wallet, InitArgs.Type.Testnet)
 
         signerWallet = view.findViewById(R.id.signer_wallet)

@@ -294,6 +294,9 @@
     <string name="import_wallet_words">Импортируйте кошелек с 24 секретными словами восстановления.</string>
     <string name="watch_wallet">Просмотр аккаунта</string>
     <string name="watch_wallet_subtitle">Для мониторинга активности кошелька без фразы восстановления</string>
+    <string name="tangem_wallet">Tangem</string>
+    <string name="tangem_wallet_subtitle">Использовать карту Tangem</string>
+    <string name="tangem_wallet_add">Приложите карту Tangem для получения публичного ключа</string>
     <string name="testnet_wallet">Testnet аккаунт</string>
     <string name="testnet_wallet_subtitle">Импортируйте кошелек с 24 секретными словами восстановления в Testnet.</string>
     <string name="signer_wallet">Пара для Signer</string>

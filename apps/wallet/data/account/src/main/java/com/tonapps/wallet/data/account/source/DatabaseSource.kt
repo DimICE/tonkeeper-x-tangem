@@ -28,6 +28,8 @@ internal class DatabaseSource(
         private const val DATABASE_VERSION = 1
 
         private const val WALLET_TABLE_NAME = "wallet"
+        private const val WALLET_TABLE_TANGEM_CARD_ID = "tangem_card_id"
+        private const val WALLET_TABLE_TANGEM_PUBLIC_KEY = "tangem_public_key"
         private const val WALLET_TABLE_ID_COLUMN = "id"
         private const val WALLET_TABLE_ID_PUBLIC_KEY = "public_key"
         private const val WALLET_TABLE_TYPE = "type"
@@ -37,6 +39,8 @@ internal class DatabaseSource(
         private fun WalletEntity.toValues(): ContentValues {
             val values = ContentValues()
             values.put(WALLET_TABLE_ID_COLUMN, id)
+            values.put(WALLET_TABLE_TANGEM_CARD_ID, tangemCardId)
+            values.put(WALLET_TABLE_TANGEM_PUBLIC_KEY, tangemPublicKey)
             values.put(WALLET_TABLE_ID_PUBLIC_KEY, publicKey.key.toByteArray())
             values.put(WALLET_TABLE_TYPE, type.id)
             values.put(WALLET_TABLE_VERSION, version.id)
@@ -48,6 +52,8 @@ internal class DatabaseSource(
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL("CREATE TABLE $WALLET_TABLE_NAME (" +
                 "$WALLET_TABLE_ID_COLUMN TEXT PRIMARY KEY," +
+                "$WALLET_TABLE_TANGEM_CARD_ID TEXT," +
+                "$WALLET_TABLE_TANGEM_PUBLIC_KEY BLOB," +
                 "$WALLET_TABLE_ID_PUBLIC_KEY BLOB," +
                 "$WALLET_TABLE_TYPE INTEGER," +
                 "$WALLET_TABLE_VERSION TEXT," +
@@ -93,14 +99,14 @@ internal class DatabaseSource(
     }
 
     suspend fun getAccounts(): List<WalletEntity> = withContext(scope.coroutineContext) {
-        val query = "SELECT $WALLET_TABLE_ID_COLUMN, $WALLET_TABLE_ID_PUBLIC_KEY, $WALLET_TABLE_TYPE, $WALLET_TABLE_VERSION, $WALLET_TABLE_LABEL FROM $WALLET_TABLE_NAME LIMIT 100;"
+        val query = "SELECT $WALLET_TABLE_ID_COLUMN, $WALLET_TABLE_ID_PUBLIC_KEY, $WALLET_TABLE_TANGEM_CARD_ID, $WALLET_TABLE_TANGEM_PUBLIC_KEY, $WALLET_TABLE_TYPE, $WALLET_TABLE_VERSION, $WALLET_TABLE_LABEL FROM $WALLET_TABLE_NAME LIMIT 100;"
         val cursor = readableDatabase.rawQuery(query, null)
         readAccounts(cursor)
     }
 
     suspend fun getAccount(id: String): WalletEntity? = withContext(scope.coroutineContext) {
         if (id.isNotBlank()) {
-            val query = "SELECT $WALLET_TABLE_ID_COLUMN, $WALLET_TABLE_ID_PUBLIC_KEY, $WALLET_TABLE_TYPE, $WALLET_TABLE_VERSION, $WALLET_TABLE_LABEL FROM $WALLET_TABLE_NAME WHERE $WALLET_TABLE_ID_COLUMN = ?;"
+            val query = "SELECT $WALLET_TABLE_ID_COLUMN, $WALLET_TABLE_ID_PUBLIC_KEY, $WALLET_TABLE_TANGEM_CARD_ID, $WALLET_TABLE_TANGEM_PUBLIC_KEY, $WALLET_TABLE_TYPE, $WALLET_TABLE_VERSION, $WALLET_TABLE_LABEL FROM $WALLET_TABLE_NAME WHERE $WALLET_TABLE_ID_COLUMN = ?;"
             val cursor = readableDatabase.rawQuery(query, arrayOf(id))
             readAccounts(cursor).firstOrNull()
         } else {
@@ -124,6 +130,8 @@ internal class DatabaseSource(
     private fun readAccounts(cursor: Cursor): List<WalletEntity> {
         val idIndex = cursor.getColumnIndex(WALLET_TABLE_ID_COLUMN)
         val publicKeyIndex = cursor.getColumnIndex(WALLET_TABLE_ID_PUBLIC_KEY)
+        val tangemCardIdKeyIndex = cursor.getColumnIndex(WALLET_TABLE_TANGEM_CARD_ID)
+        val tangemPublicKeyIndex = cursor.getColumnIndex(WALLET_TABLE_TANGEM_PUBLIC_KEY)
         val typeIndex = cursor.getColumnIndex(WALLET_TABLE_TYPE)
         val versionIndex = cursor.getColumnIndex(WALLET_TABLE_VERSION)
         val labelIndex = cursor.getColumnIndex(WALLET_TABLE_LABEL)
@@ -131,6 +139,8 @@ internal class DatabaseSource(
         while (cursor.moveToNext()) {
             val wallet = WalletEntity(
                 id = cursor.getString(idIndex),
+                tangemCardId = cursor.getString(tangemCardIdKeyIndex),
+                tangemPublicKey = cursor.getBlob(tangemPublicKeyIndex),
                 publicKey = PublicKeyEd25519(cursor.getBlob(publicKeyIndex)),
                 type = Wallet.typeOf(cursor.getInt(typeIndex)),
                 version = walletVersion(cursor.getInt(versionIndex)),
