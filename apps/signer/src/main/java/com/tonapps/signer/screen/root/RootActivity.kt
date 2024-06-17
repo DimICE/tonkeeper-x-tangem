@@ -4,8 +4,10 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.WindowManager
+import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.tonapps.blockchain.ton.extensions.base64
@@ -13,19 +15,27 @@ import com.tonapps.signer.BuildConfig
 import com.tonapps.signer.Key
 import com.tonapps.signer.R
 import com.tonapps.signer.SimpleState
+import com.tonapps.signer.drawable.IconBackgroundDrawable
 import com.tonapps.signer.extensions.toast
 import com.tonapps.signer.password.Password
 import com.tonapps.signer.password.ui.PasswordView
+import com.tonapps.signer.screen.crash.CrashActivity
 import com.tonapps.signer.screen.intro.IntroFragment
 import com.tonapps.signer.screen.main.MainFragment
 import com.tonapps.signer.screen.root.action.RootAction
 import com.tonapps.signer.screen.sign.SignFragment
+import com.tonapps.signer.screen.update.UpdateFragment
+import com.tonapps.uikit.color.accentBlueColor
+import com.tonapps.uikit.color.accentRedColor
 import kotlinx.coroutines.Job
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.ton.api.pub.PublicKeyEd25519
+import org.ton.crypto.hex
 import uikit.dialog.alert.AlertDialog
 import uikit.extensions.collectFlow
+import uikit.extensions.dp
 import uikit.extensions.primaryFragment
+import uikit.extensions.round
 import uikit.extensions.setPaddingTop
 import uikit.navigation.NavigationActivity
 
@@ -62,6 +72,11 @@ class RootActivity: NavigationActivity() {
 
         lockPasswordView = findViewById(R.id.lock_password)
         lockPasswordView.doOnPassword = ::checkPassword
+
+        val passcodeIconRadius = 8f.dp
+        val passcodeIconView = findViewById<AppCompatImageView>(R.id.passcode_icon)
+        passcodeIconView.background = IconBackgroundDrawable(this, passcodeIconRadius)
+        passcodeIconView.round(passcodeIconRadius)
 
         ViewCompat.setOnApplyWindowInsetsListener(lockView) { _, insets ->
             val topInset = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top
@@ -126,11 +141,10 @@ class RootActivity: NavigationActivity() {
 
     private fun signOut() {
         val builder = AlertDialog.Builder(this)
-        builder.setColoredButtons()
         builder.setTitle(R.string.sign_out_question)
         builder.setMessage(R.string.sign_out_subtitle)
-        builder.setPositiveButton(R.string.cancel)
-        builder.setNegativeButton(R.string.sign_out) {
+        builder.setNegativeButton(R.string.cancel, accentBlueColor)
+        builder.setPositiveButton(R.string.sign_out, accentRedColor) {
             rootViewModel.signOut()
         }
         builder.show()
@@ -138,15 +152,34 @@ class RootActivity: NavigationActivity() {
 
     private fun onAction(action: RootAction) {
         when (action) {
-            is RootAction.RequestBodySign -> add(SignFragment.newInstance(action.id, action.body, action.v, action.returnResult))
-            is RootAction.ResponseBoc -> responseBoc(action.boc)
+            is RootAction.RequestBodySign -> requestSign(action)
+            is RootAction.ResponseSignature -> responseSignature(action.signature)
             is RootAction.ResponseKey -> responseKey(action.publicKey, action.name)
+            is RootAction.UpdateApp -> updateDialog()
+            is RootAction.ClearKeys -> signOut()
         }
     }
 
-    private fun responseBoc(boc: String) {
+    private fun requestSign(request: RootAction.RequestBodySign) {
+        removeSignSheets {
+            add(SignFragment.newInstance(request.id, request.body, request.v, request.returnResult))
+        }
+    }
+
+    private fun removeSignSheets(runnable: Runnable) {
+        val transaction = supportFragmentManager.beginTransaction()
+        supportFragmentManager.fragments.forEach {
+            if (it is SignFragment) {
+                transaction.remove(it)
+            }
+        }
+        transaction.runOnCommit(runnable)
+        transaction.commitNow()
+    }
+
+    private fun responseSignature(sign: ByteArray) {
         val intent = Intent()
-        intent.putExtra(Key.BOC, boc)
+        intent.putExtra(Key.SIGN, hex(sign))
         setResult(Activity.RESULT_OK, intent)
         finish()
     }
@@ -173,9 +206,17 @@ class RootActivity: NavigationActivity() {
         }
     }
 
-    private fun handleIntent(intent: Intent) {
-        val uri = intent.data ?: return
+    private fun updateDialog() {
+        add(UpdateFragment.newInstance())
+    }
 
+    private fun handleIntent(intent: Intent) {
+        if (intent.action == Intent.ACTION_MANAGE_PACKAGE_STORAGE) {
+            signOut()
+            return
+        }
+
+        val uri = intent.data ?: return
         handleUri(uri, intent.action == Intent.ACTION_SEND)
     }
 
@@ -207,14 +248,17 @@ class RootActivity: NavigationActivity() {
         checkPasswordJob?.cancel()
     }
 
-    /*override fun onWindowFocusChanged(hasFocus: Boolean) {
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
+        if (BuildConfig.DEBUG) {
+            return
+        }
         if (hasFocus) {
             baseContainer.visibility = View.VISIBLE
         } else {
             baseContainer.visibility = View.GONE
         }
-    }*/
+    }
 
     override fun onResume() {
         super.onResume()

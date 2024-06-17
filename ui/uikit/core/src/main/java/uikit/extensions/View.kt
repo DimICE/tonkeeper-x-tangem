@@ -141,6 +141,10 @@ fun View.round(radius: Int) {
     }
 }
 
+fun View.round(radius: Float) {
+    round(radius.toInt())
+}
+
 fun View.getDrawable(@DrawableRes resId: Int): Drawable {
     return AppCompatResources.getDrawable(context, resId)!!
 }
@@ -278,4 +282,16 @@ fun View.getViews(): List<View> {
         }
     }
     return result
+}
+
+fun TextView.setLeftDrawable(drawable: Drawable?) {
+    setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null)
+}
+
+fun TextView.setRightDrawable(drawable: Drawable?) {
+    setCompoundDrawablesWithIntrinsicBounds(null, null, drawable, null)
+}
+
+fun TextView.clearDrawables() {
+    setCompoundDrawablesWithIntrinsicBounds(null, null, null, null)
 }

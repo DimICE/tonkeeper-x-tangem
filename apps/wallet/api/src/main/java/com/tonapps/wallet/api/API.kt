@@ -3,13 +3,14 @@ package com.tonapps.wallet.api
 import android.content.Context
 import android.util.ArrayMap
 import android.util.Log
-import com.tonapps.blockchain.Coin
 import com.tonapps.blockchain.ton.extensions.base64
-import com.tonapps.blockchain.ton.extensions.isValid
-import com.tonapps.extensions.ifPunycodeToUnicode
+import com.tonapps.blockchain.ton.extensions.isValidTonAddress
 import com.tonapps.extensions.locale
 import com.tonapps.extensions.unicodeToPunycode
+import com.tonapps.icu.Coins
 import com.tonapps.network.SSEvent
+import com.tonapps.network.SSLSocketFactoryTcpNoDelay
+import com.tonapps.network.SocketFactoryTcpNoDelay
 import com.tonapps.network.get
 import com.tonapps.network.interceptor.AcceptLanguageInterceptor
 import com.tonapps.network.interceptor.AuthorizationInterceptor
@@ -18,6 +19,7 @@ import com.tonapps.network.postJSON
 import com.tonapps.network.sse
 import com.tonapps.wallet.api.entity.AccountDetailsEntity
 import com.tonapps.wallet.api.entity.BalanceEntity
+import com.tonapps.wallet.api.entity.ChartEntity
 import com.tonapps.wallet.api.entity.ConfigEntity
 import com.tonapps.wallet.api.entity.TokenEntity
 import com.tonapps.wallet.api.internal.ConfigRepository
@@ -77,6 +79,8 @@ class API(
 
     fun emulation(testnet: Boolean) = provider.emulation.get(testnet)
 
+    fun liteServer(testnet: Boolean) = provider.liteServer.get(testnet)
+
     fun rates() = provider.rates.get(false)
 
     fun getEvents(
@@ -88,18 +92,23 @@ class API(
         return accounts(testnet).getAccountEvents(
             accountId = accountId,
             limit = limit,
-            beforeLt = beforeLt
+            beforeLt = beforeLt,
+            subjectOnly = true
         )
     }
 
-    fun getEvent(
+    fun getTokenEvents(
+        tokenAddress: String,
         accountId: String,
         testnet: Boolean,
-        eventId: String
-    ): AccountEvent {
-        return accounts(testnet).getAccountEvent(
+        beforeLt: Long? = null,
+        limit: Int = 20
+    ): AccountEvents {
+        return accounts(testnet).getAccountJettonHistoryByID(
+            jettonId = tokenAddress,
             accountId = accountId,
-            eventId = eventId
+            limit = limit,
+            beforeLt = beforeLt
         )
     }
 
@@ -107,8 +116,12 @@ class API(
         accountId: String,
         testnet: Boolean
     ): BalanceEntity {
-        val account = accounts(testnet).getAccount(accountId)
-        return BalanceEntity(TokenEntity.TON, Coin.toCoins(account.balance), accountId)
+        val account = getAccount(accountId, testnet) ?: return BalanceEntity(
+            token = TokenEntity.TON,
+            value = Coins.ZERO,
+            walletAddress = accountId
+        )
+        return BalanceEntity(TokenEntity.TON, Coins.of(account.balance), accountId)
     }
 
     fun getJettonsBalances(
@@ -116,11 +129,15 @@ class API(
         testnet: Boolean,
         currency: String
     ): List<BalanceEntity> {
-        val jettonsBalances = accounts(testnet).getAccountJettonsBalances(
-            accountId = accountId,
-            currencies = currency
-        ).balances
-        return jettonsBalances.map { BalanceEntity(it) }.filter { it.value > 0 }
+        try {
+            val jettonsBalances = accounts(testnet).getAccountJettonsBalances(
+                accountId = accountId,
+                currencies = currency
+            ).balances
+            return jettonsBalances.map { BalanceEntity(it) }.filter { !it.value.isZero }
+        } catch (e: Throwable) {
+            return emptyList()
+        }
     }
 
     fun resolveAddressOrName(
@@ -128,7 +145,7 @@ class API(
         testnet: Boolean
     ): AccountDetailsEntity? {
         return try {
-            val account = accounts(testnet).getAccount(query)
+            val account = getAccount(query, testnet) ?: return null
             AccountDetailsEntity(query, account, testnet)
         } catch (e: Throwable) {
             null
@@ -149,7 +166,11 @@ class API(
     }
 
     fun getRates(currency: String, tokens: List<String>): Map<String, TokenRates> {
-        return rates().getRates(tokens.joinToString(","), currency).rates
+        return try {
+            rates().getRates(tokens.joinToString(","), currency).rates
+        } catch (e: Throwable) {
+            mapOf()
+        }
     }
 
     fun getNft(address: String, testnet: Boolean): NftItem? {
@@ -161,11 +182,15 @@ class API(
     }
 
     fun getNftItems(address: String, testnet: Boolean): List<NftItem> {
-        return accounts(testnet).getAccountNftItems(
-            accountId = address,
-            limit = 1000,
-            indirectOwnership = true,
-        ).nftItems
+        return try {
+            accounts(testnet).getAccountNftItems(
+                accountId = address,
+                limit = 1000,
+                indirectOwnership = true,
+            ).nftItems
+        } catch (e: Throwable) {
+            emptyList()
+        }
     }
 
     fun getPublicKey(
@@ -199,13 +224,18 @@ class API(
         if (lastEventId != null) {
             url += "&last_event_id=$lastEventId"
         }
+        Log.d("TonConnectBridge", "tonconnectEvents: sse = $url")
         return tonAPIHttpClient.sse(url)
     }
 
-    fun tonconnectPayload(): String {
-        val url = "${config.tonapiMainnetHost}/v2/tonconnect/payload"
-        val json = JSONObject(tonAPIHttpClient.get(url))
-        return json.getString("payload")
+    fun tonconnectPayload(): String? {
+        try {
+            val url = "${config.tonapiMainnetHost}/v2/tonconnect/payload"
+            val json = JSONObject(tonAPIHttpClient.get(url))
+            return json.getString("payload")
+        } catch (e: Throwable) {
+            return null
+        }
     }
 
     fun tonconnectProof(address: String, proof: String): String {
@@ -227,6 +257,7 @@ class API(
         val mimeType = "text/plain".toMediaType()
         val url = "${BRIDGE_URL}/message?client_id=$publicKeyHex&to=$clientId&ttl=300"
         val response = tonAPIHttpClient.post(url, body.toRequestBody(mimeType))
+        Log.d("TonConnectBridge", "tonconnectSend: ${response.code}")
         if (!response.isSuccessful) {
             throw Exception("Failed sending event: ${response.code}")
         }
@@ -234,10 +265,10 @@ class API(
 
     suspend fun emulate(
         boc: String,
-        testnet: Boolean
+        testnet: Boolean,
     ): MessageConsequences = withContext(Dispatchers.IO) {
         val request = EmulateMessageToWalletRequest(boc)
-        emulation(testnet).emulateMessageToWallet(request)
+        emulation(testnet).emulateMessageToWallet(request, ignoreSignatureCheck = true)
     }
 
     suspend fun emulate(
@@ -276,7 +307,7 @@ class API(
         value: String,
         testnet: Boolean,
     ): Account? = withContext(Dispatchers.IO) {
-        if (value.isValid()) {
+        if (value.isValidTonAddress()) {
             return@withContext getAccount(value, testnet)
         }
         return@withContext resolveDomain(value.lowercase().trim(), testnet)
@@ -367,8 +398,12 @@ class API(
         }
     }
 
-    fun getBrowserApps(): JSONObject {
-        return internalApi.getBrowserApps()
+    fun getBrowserApps(testnet: Boolean): JSONObject {
+        return internalApi.getBrowserApps(testnet)
+    }
+
+    fun getFiatMethods(): JSONObject {
+        return internalApi.getFiatMethods()
     }
 
     fun getTransactionEvents(accountId: String, testnet: Boolean, eventId: String): AccountEvent? {
@@ -379,11 +414,42 @@ class API(
         }
     }
 
+    fun loadChart(
+        token: String,
+        currency: String,
+        startDate: Long,
+        endDate: Long
+    ): List<ChartEntity> {
+        try {
+            val url = "${config.tonapiMainnetHost}/v2/rates/chart?token=$token&currency=$currency&end_date=$endDate&start_date=$startDate"
+            val array = JSONObject(tonAPIHttpClient.get(url)).getJSONArray("points")
+            return (0 until array.length()).map { index ->
+                ChartEntity(array.getJSONArray(index))
+            }
+        } catch (e: Throwable) {
+            return listOf(ChartEntity(0, 0f))
+        }
+    }
+
+    suspend fun getServerTime(testnet: Boolean): Int = withContext(Dispatchers.IO) {
+        try {
+            liteServer(testnet).getRawTime().time
+        } catch (e: Throwable) {
+            (System.currentTimeMillis() / 1000).toInt()
+        }
+    }
+
+    suspend fun resolveCountry(): String? = withContext(Dispatchers.IO) {
+        internalApi.resolveCountry()
+    }
+
     companion object {
 
         const val BRIDGE_URL = "https://bridge.tonapi.io/bridge"
 
         val JSON = Json { prettyPrint = true }
+
+        private val socketFactoryTcpNoDelay = SSLSocketFactoryTcpNoDelay()
 
         private fun baseOkHttpClientBuilder(): OkHttpClient.Builder {
             return OkHttpClient().newBuilder()
@@ -392,6 +458,11 @@ class API(
                 .readTimeout(10, TimeUnit.SECONDS)
                 .writeTimeout(10, TimeUnit.SECONDS)
                 .callTimeout(10, TimeUnit.SECONDS)
+                .pingInterval(5, TimeUnit.SECONDS)
+                .followSslRedirects(true)
+                .followRedirects(true)
+                // .sslSocketFactory(socketFactoryTcpNoDelay.sslSocketFactory, socketFactoryTcpNoDelay.trustManager)
+                // .socketFactory(SocketFactoryTcpNoDelay())
         }
 
         private fun createTonAPIHttpClient(

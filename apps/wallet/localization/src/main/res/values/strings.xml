@@ -4,8 +4,45 @@
     <string name="toncoin" translatable="false">Toncoin</string>
     <string name="bitcoin" translatable="false">Bitcoin</string>
 
+    <string name="edit">Edit</string>
+    <string name="pinned">Pinned</string>
+    <string name="all_assets">All Assets</string>
+    <string name="sorted_by_price">Sorted by Price</string>
+
+    <string name="manual">Manual</string>
+    <string name="manual_description">Back up your wallet manually by writing down the recovery phrase.</string>
+    <string name="manual_backup_done">Manual Backup Done</string>
+    <string name="manual_backup_date">Last backup %1$s</string>
+    <string name="manual_start_button">Back Up Manually</string>
+    <string name="backup_attention_title">Attention</string>
+    <string name="backup_attention_description">Please read the following carefully before viewing your recovery phrase.</string>
+    <string name="backup_attention_line_1">Never enter your recovery phrase any other place than Tonkeeper to access your wallet.</string>
+    <string name="backup_attention_line_2">Tonkeeper Support never asks for a recovery phrase.</string>
+    <string name="backup_attention_line_3">Everybody with your recovery phrase can access your wallet.</string>
+    <string name="manual_backup_check">Check Backup</string>
+    <string name="backup_check">Backup Check</string>
+    <string name="backup_check_subtitle">Let\'s see if you\'ve got everything right. Enter words %1$d, %2$d, and %3$d.</string>
+
+    <string name="refresh">Refresh</string>
+    <string name="mute">Mute</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="apps">Apps</string>
+    <string name="apps_notifications_description">Notifications from connected apps in your activity</string>
+    <string name="push_notifications">Push notifications</string>
+    <string name="push_notifications_description">Get notifications when you receive TON, tokens, and NFTs. Notifications from connected apps.</string>
+
+    <string name="faq" translatable="false">FAQ</string>
     <string name="failed">Failed</string>
     <string name="remove_dapp_confirm">Remove %1$s?</string>
+    <string name="rate_tonkeeper">Rate Tonkeeper</string>
+    <string name="encrypted_comment">Encrypted comment</string>
+    <string name="encrypted_comment_description">The comment is encrypted by sender and can only be decrypted by you. Please be careful with the content and beware of scams.</string>
+    <string name="decrypted_comment_action">Decrypt the comment</string>
+    <string name="comment_decrypted_hint">Will be visible to everyone.</string>
+    <string name="encrypt_comment">Encrypt comment</string>
+
+    <string name="comment_encrypted_hint">Will be visible only to recipient and you.</string>
+    <string name="decrypt_comment">Decrypt</string>
 
     <string name="sign_out">Sign out</string>
     <string name="delete_watch_account_alert">Delete watch account?</string>
@@ -42,6 +79,8 @@
     <string name="unsubscribed">Unsubscribed</string>
     <string name="subscribed">Subscribed</string>
     <string name="received">Received</string>
+    <string name="nft_transfer">NFT Transfer</string>
+    <string name="nft_disabled_transfer">NFT is on sale at the marketplace now. For transfer, you should remove it from sale first.</string>
 
     <string name="continue_action">Continue</string>
     <string name="get_started">Get started</string>
@@ -107,19 +146,25 @@
     <string name="passcode_enter">Enter passcode</string>
     <string name="passcode_create">Create passcode</string>
     <string name="passcode_re_enter">Re-enter passcode</string>
+    <string name="passcode_current">Enter current passcode</string>
+    <string name="passcode_new">Create new passcode</string>
     <string name="import_wallet">Import wallet</string>
     <string name="import_wallet_subtitle">Choose from the options below.</string>
     <string name="import_wallet_words">Import wallet with a 24 secret recovery words</string>
     <string name="watch_wallet">Watch Account</string>
     <string name="watch_wallet_subtitle">For monitor wallet activity without recovery phrase</string>
+    <string name="tangem_wallet">Tangem</string>
+    <string name="tangem_wallet_subtitle">Use Tangem card</string>
+    <string name="tangem_wallet_add">Attach Tangem card to receive a public key</string>
     <string name="watch_wallet_add">Monitor wallet activity without recovery phrase. You will be notified of any transactions from this wallet.</string>
     <string name="testnet_wallet">Testnet Account</string>
     <string name="testnet_wallet_subtitle">Import wallet with a 24 secret recovery words to Testnet</string>
-    <string name="signer_wallet">Pair Signer</string>
+    <string name="signer_wallet">Pair with Signer</string>
     <string name="signer_wallet_subtitle">A higher level of control and security</string>
     <string name="cancel">Cancel</string>
     <string name="fee">Fee</string>
     <string name="period_24h">24h</string>
+    <string name="notifications">Notifications</string>
     <string name="enable_notification">Enable notification</string>
     <string name="allow_notification">Allow Notifications</string>
     <string name="enable_notification_title">Get instant notifications</string>
@@ -148,6 +193,9 @@
     <string name="sending_transaction">Sending transaction</string>
     <string name="transaction_confirmed">Transaction confirmed</string>
 
+    <string name="connected_placeholder_title">Connected apps will be shown here</string>
+    <string name="connected_placeholder_subtitle">Explore apps and services in Tonkeeper browser.</string>
+
     <string name="send">Send</string>
     <string name="swap">Swap</string>
     <string name="manage">Manage</string>
@@ -155,6 +203,7 @@
     <string name="receive">Receive</string>
     <string name="log_out">Log out</string>
     <string name="amount">Amount</string>
+    <string name="backup">Backup</string>
 
     <string name="recipient">Recipient</string>
     <string name="recipient_address">Recipient address</string>
@@ -206,6 +255,8 @@
 
     <string name="done">Done</string>
     <string name="error">Error</string>
+    <string name="unnamed_collection">Unnamed collection</string>
+    <string name="view_details">View details</string>
 
     <string name="receive_coin">Receive %1$s</string>
     <string name="receive_coin_description">Send only %1$s and tokens in TON network to this address, or you might lose your funds.</string>
@@ -256,6 +307,7 @@
     <string name="signer_description">Open Signer » Select the required key » Scan QR code</string>
     <string name="signer_open">Open Signer on this device</string>
     <string name="signer" translatable="false">Signer</string>
+    <string name="tangem" translatable="false">Tangem</string>
     <string name="choose_wallet_title">Choose wallet</string>
     <string name="choose_wallet_subtitle">Choose wallets you want to add.</string>
 

@@ -9,11 +9,11 @@ android {
     compileSdk = Build.compileSdkVersion
 
     defaultConfig {
-        applicationId = "com.tonapps.signer"
+        applicationId = Build.namespacePrefix("signer")
         minSdk = Build.minSdkVersion
         targetSdk = 34
-        versionCode = 8
-        versionName = "0.0.8"
+        versionCode = 16
+        versionName = "0.1.6"
     }
 
     lint {
@@ -59,15 +59,13 @@ android {
 }
 
 dependencies {
-    implementation(Dependence.AndroidX.profileinstaller)
-    "baselineProfile"(project(":baselineprofile:signer"))
-
     implementation(Dependence.AndroidX.core)
     implementation(Dependence.AndroidX.appCompat)
     implementation(Dependence.AndroidX.activity)
     implementation(Dependence.AndroidX.fragment)
     implementation(Dependence.AndroidX.recyclerView)
     implementation(Dependence.AndroidX.viewPager2)
+    implementation(Dependence.AndroidX.splashscreen)
 
     implementation(Dependence.UI.material)
     implementation(Dependence.AndroidX.Camera.base)
