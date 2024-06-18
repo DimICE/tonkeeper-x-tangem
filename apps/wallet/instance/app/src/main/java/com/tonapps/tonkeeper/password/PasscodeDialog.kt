@@ -48,11 +48,11 @@ class PasscodeDialog(
     private fun checkValues(code: String) {
         passcodeView.isEnabled = false
         lifecycleScope.launch(Dispatchers.Main) {
-            val valid = if (context.isMainVersion && !settingsRepository.importLegacyPasscode) {
+            if (context.isMainVersion && !settingsRepository.importLegacyPasscode) {
                 importLegacyPasscode(code)
-            } else {
-                passcodeDataStore.compare(code)
             }
+
+            val valid = passcodeDataStore.compare(code)
             if (!valid) {
                 passcodeView.setError()
                 return@launch

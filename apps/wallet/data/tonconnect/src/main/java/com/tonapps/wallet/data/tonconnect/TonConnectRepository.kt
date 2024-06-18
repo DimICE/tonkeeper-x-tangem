@@ -279,15 +279,10 @@ class TonConnectRepository(
 
     suspend fun connect(
         wallet: WalletEntity,
-        privateKey: PrivateKeyEd25519,
-        manifest: DAppManifestEntity,
-        clientId: String,
-        requestItems: List<DAppItemEntity>,
+        app: DAppEntity,
+        items: List<DAppReply>,
         firebaseToken: String?,
     ): DAppEventSuccessEntity = withContext(Dispatchers.IO) {
-        val enablePush = firebaseToken != null
-        val app = newApp(manifest, wallet.accountId, wallet.testnet, clientId, wallet.id, enablePush)
-        val items = createItems(app, wallet, privateKey, requestItems)
         val res = DAppEventSuccessEntity(items)
         send(app, res.toJSON())
         firebaseToken?.let {
@@ -309,10 +304,9 @@ class TonConnectRepository(
         DAppEventSuccessEntity(items)
     }
 
-    private fun createItems(
+    public fun createItems(
         app: DAppEntity,
         wallet: WalletEntity,
-        privateKey: PrivateKeyEd25519,
         items: List<DAppItemEntity>
     ): List<DAppReply> {
         val result = mutableListOf<DAppReply>()
@@ -329,7 +323,6 @@ class TonConnectRepository(
                     payload = requestItem.payload ?: "",
                     domain = app.domain,
                     address = wallet.contract.address,
-                    privateWalletKey = privateKey,
                     stateInit = wallet.contract.getStateCell().base64()
                 ))
             }
@@ -341,12 +334,10 @@ class TonConnectRepository(
         payload: String,
         domain: ProofDomainEntity,
         address: AddrStd,
-        privateWalletKey: PrivateKeyEd25519,
         stateInit: String,
     ): DAppProofItemReplySuccess {
-        val proof = WalletProof.sign(
+        val proof = WalletProof.withOutSign(
             address,
-            privateWalletKey,
             payload,
             domain,
             stateInit

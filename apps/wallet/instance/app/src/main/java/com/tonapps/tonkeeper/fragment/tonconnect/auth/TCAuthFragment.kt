@@ -142,7 +142,8 @@ class TCAuthFragment: BaseFragment(R.layout.dialog_ton_connect), BaseFragment.Mo
         connectProcessView.visibility = View.VISIBLE
         connectProcessView.state = ProcessTaskView.State.LOADING
 
-        viewModel.connect(requireContext(), allowNotificationCheckbox.checked).catch {
+        viewModel.connect(requireContext(), allowNotificationCheckbox.checked).catch { e ->
+            Log.v("Tangem", e.toString())
             setFailure()
         }.onEach {
             setSuccess(it)

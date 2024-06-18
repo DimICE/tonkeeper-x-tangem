@@ -13,7 +13,7 @@ object WalletProof {
 
     private const val tonProofPrefix = "ton-proof-item-v2/"
     private const val tonConnectPrefix = "ton-connect"
-    private val prefixMessage = hex("ffff") + tonConnectPrefix.toByteArray()
+    public val prefixMessage = hex("ffff") + tonConnectPrefix.toByteArray()
     private val prefixItem = tonProofPrefix.toByteArray()
 
     fun signTonkeeper(
@@ -44,7 +44,28 @@ object WalletProof {
             timestamp = timestamp,
             domain = domain,
             payload = payload,
+            signatureMessage = signatureMessage,
             signature = base64(signature),
+            stateInit = stateInit,
+        )
+    }
+
+    fun withOutSign(
+        address: AddrStd,
+        payload: String,
+        domain: ProofDomainEntity,
+        stateInit: String,
+    ): ProofEntity {
+        val timestamp = System.currentTimeMillis() / 1000L
+        val message = createMessage(timestamp, payload.toByteArray(), domain, address)
+        val signatureMessage = sha256(message)
+
+        return ProofEntity(
+            timestamp = timestamp,
+            domain = domain,
+            payload = payload,
+            signatureMessage = signatureMessage,
+            signature = null,
             stateInit = stateInit,
         )
     }

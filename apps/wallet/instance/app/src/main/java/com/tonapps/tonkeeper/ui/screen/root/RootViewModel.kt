@@ -32,6 +32,7 @@ import com.tonapps.tonkeeperx.R
 import com.tonapps.wallet.api.API
 import com.tonapps.wallet.data.account.entities.WalletEntity
 import com.tonapps.wallet.data.account.AccountRepository
+import com.tonapps.wallet.data.account.Wallet
 import com.tonapps.wallet.data.core.ScreenCacheSource
 import com.tonapps.wallet.data.core.Theme
 import com.tonapps.wallet.data.core.WalletCurrency
@@ -369,7 +370,7 @@ class RootViewModel(
         wallet: WalletEntity
     ) {
         try {
-            if (!wallet.hasPrivateKey) {
+            if (wallet.type !== Wallet.Type.Tangem && !wallet.hasPrivateKey) {
                 toast(Localization.not_supported)
                 return
             }

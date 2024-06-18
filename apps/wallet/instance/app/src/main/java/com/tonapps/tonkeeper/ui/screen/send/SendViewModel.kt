@@ -30,6 +30,7 @@ import com.tonapps.wallet.data.rates.RatesRepository
 import com.tonapps.wallet.data.settings.SettingsRepository
 import com.tonapps.wallet.data.token.TokenRepository
 import com.tonapps.wallet.data.token.entities.AccountTokenEntity
+import com.tonapps.wallet.localization.Localization
 import io.tonapi.models.Account
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
@@ -248,15 +249,23 @@ class SendViewModel(
     ) { wallet, message, currency ->
         val code = TokenEntity.TON.symbol
         val rates = ratesRepository.getRates(currency, code)
-        val fee = api.emulate(message, wallet.testnet).totalFees
-        val coins = Coins.of(fee)
-        val converted = rates.convert(code, coins)
+        try {
+            val fee = api.emulate(message, wallet.testnet).totalFees
+            val coins = Coins.of(fee)
+            val converted = rates.convert(code, coins)
 
-        SendFeeState(
-            value = coins,
-            format = CurrencyFormatter.format(code, coins, TokenEntity.TON.decimals),
-            convertedFormat = CurrencyFormatter.format(currency.code, converted, currency.decimals),
-        )
+            SendFeeState(
+                value = coins,
+                format = CurrencyFormatter.format(code, coins, TokenEntity.TON.decimals),
+                convertedFormat = CurrencyFormatter.format(currency.code, converted, currency.decimals),
+            )
+        } catch (_: Throwable) {
+            SendFeeState(
+                value = Coins.of(0),
+                format = "",
+                convertedFormat = "",
+            )
+        }
     }.flowOn(Dispatchers.IO)
 
     fun userInputAmount(double: Double) {

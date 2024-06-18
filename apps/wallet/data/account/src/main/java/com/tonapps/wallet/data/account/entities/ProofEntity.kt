@@ -6,7 +6,8 @@ data class ProofEntity(
     val timestamp: Long,
     val domain: ProofDomainEntity,
     val payload: String?,
-    val signature: String,
+    val signatureMessage: ByteArray,
+    var signature: String?,
     val stateInit: String? = null
 ) {
 
