@@ -389,4 +389,13 @@ class AccountRepository(
         val data = messageBody(wallet, seqno, validUntil, transfers)
         return wallet.sign(privateKeyEd25519, data.seqno, data.body)
     }
+
+    fun createMessage(
+        wallet: WalletEntity,
+        seqno: Int,
+        validUntil: Long,
+        transfers: List<WalletTransfer>
+    ): MessageBodyEntity {
+        return messageBody(wallet, seqno, validUntil, transfers)
+    }
 }
