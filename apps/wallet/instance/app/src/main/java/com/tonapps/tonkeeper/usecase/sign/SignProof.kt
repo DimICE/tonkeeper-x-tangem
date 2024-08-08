@@ -5,6 +5,7 @@ import com.tonapps.blockchain.ton.proof.TONProof
 import com.tonapps.blockchain.ton.proof.TONProof.Address
 import com.tonapps.blockchain.ton.proof.TONProof.Domain
 import com.tonapps.blockchain.ton.proof.TONProof.Request
+import com.tonapps.tonkeeper.core.TangemHelper
 import com.tonapps.tonkeeper.extensions.requestPrivateKey
 import com.tonapps.tonkeeper.ui.screen.external.qr.keystone.sign.KeystoneSignScreen
 import com.tonapps.tonkeeper.ui.screen.ledger.proof.LedgerProofScreen
@@ -14,6 +15,7 @@ import com.tonapps.wallet.data.account.entities.WalletEntity
 import com.tonapps.wallet.data.passcode.PasscodeManager
 import com.tonapps.wallet.data.rn.RNLegacy
 import com.tonapps.wallet.localization.Localization
+import org.ton.crypto.digest.sha256
 import org.ton.crypto.hex
 import uikit.extensions.addForResult
 import uikit.navigation.NavigationActivity
@@ -42,6 +44,34 @@ class SignProof(
         val signature = result.getByteArray(LedgerProofScreen.SIGNED_PROOF)
         if (signature == null || signature.isEmpty()) {
             throw CancellationException("Ledger cancelled")
+        }
+
+        return TONProof.Result(
+            timestamp = timestamp,
+            domain = Domain(domain),
+            payload = payload,
+            signature = signature.encodeBase64()
+        )
+    }
+
+    suspend fun tangem(
+        activity: NavigationActivity,
+        wallet: WalletEntity,
+        payload: String,
+        domain: String,
+    ): TONProof.Result {
+        val request = Request(
+            payload = payload,
+            domain = Domain(domain),
+            address = Address(wallet.contract.address)
+        )
+        val tonConnectPrefix = "ton-connect"
+        val prefixMessage = hex("ffff") + tonConnectPrefix.toByteArray()
+        val body = sha256(prefixMessage + request.signatureMessage)
+        val timestamp = System.currentTimeMillis() / 1000L
+        val signature = TangemHelper.singWithTangem(activity, wallet, body)
+        if (signature == null || signature.isEmpty()) {
+            throw CancellationException("Tangem cancelled")
         }
 
         return TONProof.Result(

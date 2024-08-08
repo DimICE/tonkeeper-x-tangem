@@ -209,6 +209,7 @@ class BalanceHolder(
 
         builder = when (type) {
             Wallet.Type.Signer, Wallet.Type.SignerQR -> builder.badgePurple(context, Localization.signer)
+            Wallet.Type.Tangem -> builder.badgeGreen(context, Localization.tangem)
             Wallet.Type.Ledger -> builder.badgeGreen(context, Localization.ledger)
             Wallet.Type.Testnet -> builder.badgeOrange(context, Localization.testnet)
             Wallet.Type.Watch -> builder.badgeOrange(context, Localization.watch_only)

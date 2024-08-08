@@ -329,6 +329,9 @@
     <string name="import_wallet_words">Import wallet with a 24 or 12 secret recovery words</string>
     <string name="watch_wallet">Watch Account</string>
     <string name="watch_wallet_subtitle">For monitor wallet activity without recovery phrase</string>
+    <string name="tangem_wallet">Tangem</string>
+    <string name="tangem_wallet_subtitle">Use Tangem card</string>
+    <string name="tangem_wallet_add">Attach Tangem card to receive a public key</string>
     <string name="watch_wallet_add">Monitor wallet activity without recovery phrase. You will be notified of any transactions from this wallet.</string>
     <string name="testnet_wallet">Testnet Account</string>
     <string name="testnet_wallet_subtitle">Import wallet with a 24 or 12 secret recovery words to Testnet</string>
@@ -491,6 +494,7 @@
     <string name="signer_about">About Signer</string>
     <string name="signer_open">Open Signer on this device</string>
     <string name="signer" translatable="false">Signer</string>
+    <string name="tangem" translatable="false">Tangem</string>
     <string name="choose_wallet_title">Choose wallets</string>
     <string name="choose_wallet_subtitle">Choose wallets you want to add.</string>
     <string name="choose_wallet_already_added">Already added</string>

@@ -335,7 +335,9 @@ class AccountRepository(
         publicKey: PublicKeyEd25519,
         versions: List<WalletVersion>,
         type: Wallet.Type,
-        initialized: List<Boolean>
+        initialized: List<Boolean>,
+        tangemCardId: String? = null,
+        tangemPublicKey: ByteArray? = null,
     ): List<WalletEntity> {
         val list = mutableListOf<WalletEntity>()
         for ((index, version) in versions.withIndex()) {
@@ -344,6 +346,8 @@ class AccountRepository(
                 publicKey = publicKey,
                 type = type,
                 version = version,
+                tangemCardId = tangemCardId,
+                tangemPublicKey = tangemPublicKey,
                 label = label.create(index),
                 initialized = initialized[index]
             )
@@ -360,6 +364,17 @@ class AccountRepository(
         version: WalletVersion,
     ): WalletEntity {
         return addWallet(newWalletId(), label, publicKey, Wallet.Type.Watch, version, initialized = false)
+    }
+
+    suspend fun addTangemWallet(
+        label: Wallet.NewLabel,
+        publicKey: PublicKeyEd25519,
+        versions: List<WalletVersion>,
+        tangemCardId: String,
+        tangemPublicKey: ByteArray,
+        initialized: List<Boolean>
+    ): List<WalletEntity> {
+        return addWallet(versions.map { newWalletId() }, label, publicKey, versions, Wallet.Type.Tangem, initialized, tangemCardId, tangemPublicKey)
     }
 
     suspend fun addNewWallet(

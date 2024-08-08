@@ -30,6 +30,8 @@ data class WalletEntity(
     val type: Wallet.Type,
     val version: WalletVersion,
     val label: Wallet.Label,
+    val tangemCardId: String? = null,
+    val tangemPublicKey: ByteArray? = null,
     val ledger: Ledger? = null,
     val keystone: Keystone? = null,
     val initialized: Boolean,
@@ -100,11 +102,14 @@ data class WalletEntity(
     val isKeystone: Boolean
         get() = type == Wallet.Type.Keystone
 
+    val isTangem: Boolean
+        get() = type == Wallet.Type.Tangem
+
     val isW5: Boolean
         get() = version == WalletVersion.V5BETA || version == WalletVersion.V5R1
 
     val isExternal: Boolean
-        get() = signer || isLedger || isKeystone
+        get() = signer || isLedger || isKeystone || isTangem
 
     val isTonConnectSupported: Boolean
         get() = type != Wallet.Type.Watch // !testnet &&

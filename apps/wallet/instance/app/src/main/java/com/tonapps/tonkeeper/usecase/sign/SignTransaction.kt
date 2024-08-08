@@ -4,6 +4,7 @@ import android.util.Log
 import com.tonapps.blockchain.ton.extensions.EmptyPrivateKeyEd25519.sign
 import com.tonapps.blockchain.ton.extensions.hex
 import com.tonapps.ledger.ton.Transaction
+import com.tonapps.tonkeeper.core.TangemHelper
 import com.tonapps.tonkeeper.core.signer.SignerHelper
 import com.tonapps.tonkeeper.extensions.requestPrivateKey
 import com.tonapps.tonkeeper.ui.screen.external.qr.keystone.sign.KeystoneSignScreen
@@ -63,6 +64,7 @@ class SignTransaction(
             Wallet.Type.Signer -> signerApp(activity, wallet, unsignedBody)
             Wallet.Type.Default, Wallet.Type.Testnet, Wallet.Type.Lockup -> default(activity, wallet, unsignedBody)
             Wallet.Type.Keystone -> keystone(activity, wallet, unsignedBody)
+            Wallet.Type.Tangem -> tangem(activity, wallet, unsignedBody)
             else -> {
                 throw IllegalArgumentException("Unsupported wallet type: ${wallet.type}")
             }
@@ -83,6 +85,15 @@ class SignTransaction(
         )
         val result = activity.addForResult(fragment)
         return fragment.contract.parseResult(result)
+    }
+
+    private suspend fun tangem(
+        activity: NavigationActivity,
+        wallet: WalletEntity,
+        unsignedBody: Cell
+    ): BitString = withContext(Dispatchers.IO) {
+        val hash = TangemHelper.singWithTangem(activity, wallet, unsignedBody.hash().toByteArray()) ?: throw IllegalStateException("Tangem cancelled")
+        BitString(hash)
     }
 
     private suspend fun signerQR(

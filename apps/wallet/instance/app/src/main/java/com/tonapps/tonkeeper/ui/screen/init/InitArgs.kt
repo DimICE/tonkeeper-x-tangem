@@ -23,7 +23,7 @@ data class InitArgs(
 ) : BaseArgs() {
 
     enum class Type {
-        New, Import, Watch, Testnet, Signer, SignerQR, Ledger, Keystone,
+        New, Import, Watch, Testnet, Signer, SignerQR, Ledger, Keystone, Tangem,
     }
 
     private companion object {

@@ -21,7 +21,7 @@ object Dependence {
     }
 
     object KotlinX {
-        const val coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.1"
+        const val coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1"
         const val serialization = "org.jetbrains.kotlinx:kotlinx-serialization-core:1.8.0"
         const val serializationJSON = "org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0"
         const val serializationCBOR = "org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.8.0"

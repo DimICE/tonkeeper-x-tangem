@@ -15,6 +15,7 @@ import com.tonapps.tonkeeper.ui.screen.init.step.PushScreen
 import com.tonapps.tonkeeper.ui.screen.init.step.SelectScreen
 import com.tonapps.tonkeeper.ui.screen.init.step.WatchScreen
 import com.tonapps.tonkeeper.ui.screen.init.step.WordsScreen
+import com.tonapps.tonkeeper.ui.screen.init.step.TangemScreen
 import com.tonapps.tonkeeperx.R
 import com.tonapps.uikit.color.backgroundPageColor
 import com.tonapps.wallet.data.account.entities.WalletEntity
@@ -99,6 +100,7 @@ class InitScreen: BaseWalletScreen<ScreenContext.None>(R.layout.fragment_init, S
             InitRoute.ReEnterPasscode -> PasscodeScreen.newInstance(true)
             InitRoute.ImportWords -> WordsScreen.newInstance(false)
             InitRoute.WatchAccount -> WatchScreen.newInstance()
+            InitRoute.TangemAccount -> TangemScreen.newInstance(false)
             InitRoute.LabelAccount -> LabelScreen.newInstance()
             InitRoute.SelectAccount -> SelectScreen.newInstance()
             InitRoute.Push -> PushScreen.newInstance()

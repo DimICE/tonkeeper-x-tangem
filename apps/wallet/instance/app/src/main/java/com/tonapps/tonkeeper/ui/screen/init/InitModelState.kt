@@ -49,6 +49,8 @@ class InitModelState(private val savedStateHandle: SavedStateHandle) {
         private const val MNEMONIC_KEY = "mnemonic"
         private const val ACCOUNTS = "accounts"
         private const val PUBLIC_KEY = "public_key"
+        private const val TANGEM_CARD_ID = "tangem_card_id"
+        private const val TANGEM_PUBLIC_KEY = "tangem_public_key"
         private const val LEDGER_CONNECT_DATA = "ledger_connect_data"
         private const val ENABLE_PUSH_KEY = "enable_push"
         private const val KEYSTONE_KEY = "keystone"
@@ -89,6 +91,14 @@ class InitModelState(private val savedStateHandle: SavedStateHandle) {
             return savedStateHandle.get<PublicKey>(PUBLIC_KEY)
         }
         set(value) = savedStateHandle.set(PUBLIC_KEY, value)
+
+    var tangemCardId: String?
+        get() = savedStateHandle[TANGEM_CARD_ID]
+        set(value) = savedStateHandle.set(TANGEM_CARD_ID, value)
+
+    var tangemPublicKey: ByteArray?
+        get() = savedStateHandle[TANGEM_PUBLIC_KEY]
+        set(value) = savedStateHandle.set(TANGEM_PUBLIC_KEY, value)
 
     var ledgerConnectData: LedgerConnectData?
         get() = savedStateHandle[LEDGER_CONNECT_DATA]

@@ -163,6 +163,9 @@
     <string name="import_wallet_words">Добавить кошелёк с помощью секретного ключа из 24 или 12 слов</string>
     <string name="watch_wallet">Аккаунт для просмотра</string>
     <string name="watch_wallet_subtitle">Для отслеживания активности кошелька без ввода секретного ключа</string>
+    <string name="tangem_wallet">Tangem</string>
+    <string name="tangem_wallet_subtitle">Использовать карту Tangem</string>
+    <string name="tangem_wallet_add">Приложите карту Tangem для получения публичного ключа</string>
     <string name="testnet_wallet">Аккаунт в Testnet</string>
     <string name="keystone_description">Откройте Keystone » Программные кошельки » Tonkeeper</string>
     <string name="keystone_about">О Keystone</string>

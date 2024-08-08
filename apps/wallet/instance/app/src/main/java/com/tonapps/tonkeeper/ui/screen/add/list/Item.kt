@@ -20,6 +20,7 @@ sealed class Item(type: Int): BaseListItem(type) {
         const val LEDGER_WALLET_ID = 5
         const val KEYSTONE_WALLET_ID = 6
         const val NEW_WALLET_ID = 7
+        const val TANGEM_WALLET_ID = 8
 
         fun header(title: Int, subtitle: Int): Header {
             return Header(title, subtitle)
@@ -44,6 +45,13 @@ sealed class Item(type: Int): BaseListItem(type) {
             iconResId = R.drawable.ic_magnifying_glass_28,
             titleResId = Localization.watch_wallet,
             subtitleResId = Localization.watch_wallet_subtitle
+        )
+
+        val tangem = Wallet(
+            id = TANGEM_WALLET_ID,
+            iconResId = com.tonapps.emoji.R.drawable.ic_label_back_card,
+            titleResId = Localization.tangem_wallet,
+            subtitleResId = Localization.tangem_wallet_subtitle
         )
 
         val testnet = Wallet(

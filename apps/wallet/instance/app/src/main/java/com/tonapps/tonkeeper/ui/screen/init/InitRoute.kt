@@ -5,6 +5,7 @@ sealed class InitRoute {
     data object ReEnterPasscode: InitRoute()
     data object ImportWords: InitRoute()
     data object WatchAccount: InitRoute()
+    data object TangemAccount: InitRoute()
     data object LabelAccount: InitRoute()
     data object SelectAccount: InitRoute()
     data object Push: InitRoute()

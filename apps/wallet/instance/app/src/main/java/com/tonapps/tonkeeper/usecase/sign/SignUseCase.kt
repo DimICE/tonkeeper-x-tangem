@@ -33,6 +33,8 @@ class SignUseCase(
             signProof.keystone(activity, wallet, payload, domain)
         } else if (wallet.type == Wallet.Type.Ledger) {
             signProof.ledger(activity, wallet, payload, domain)
+        } else if (wallet.type == Wallet.Type.Tangem) {
+            signProof.tangem(activity, wallet, payload, domain)
         } else if (wallet.hasPrivateKey) {
             signProof.default(activity, wallet, payload, domain)
         } else {

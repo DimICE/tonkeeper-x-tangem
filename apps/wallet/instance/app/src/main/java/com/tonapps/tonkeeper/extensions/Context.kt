@@ -165,6 +165,7 @@ fun Context.getWalletBadges(
             Wallet.Type.Testnet -> Localization.testnet
             Wallet.Type.Signer, Wallet.Type.SignerQR -> Localization.signer
             Wallet.Type.Ledger -> Localization.ledger
+            Wallet.Type.Tangem -> Localization.tangem
             Wallet.Type.Keystone -> Localization.keystone
             else -> throw IllegalArgumentException("Unknown wallet type: $type")
         }

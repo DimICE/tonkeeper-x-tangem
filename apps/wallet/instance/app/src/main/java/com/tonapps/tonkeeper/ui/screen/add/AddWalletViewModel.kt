@@ -23,6 +23,7 @@ class AddWalletViewModel(
         }
         uiItems.add(Item.import)
         uiItems.add(Item.watch)
+        uiItems.add(Item.tangem)
         uiItems.add(Item.testnet)
         if (!api.config.flags.disableSigner) {
             uiItems.add(Item.signer)

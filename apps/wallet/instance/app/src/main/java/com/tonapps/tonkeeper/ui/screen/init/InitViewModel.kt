@@ -65,6 +65,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.ton.api.pk.PrivateKeyEd25519
+import org.ton.api.pub.PublicKeyEd25519
 import org.ton.block.AddrStd
 import org.ton.mnemonic.Mnemonic
 import uikit.navigation.Navigation
@@ -164,6 +165,7 @@ class InitViewModel(
     private suspend fun start() {
         when (type) {
             InitArgs.Type.Watch -> routeTo(InitRoute.WatchAccount)
+            InitArgs.Type.Tangem -> routeTo(InitRoute.TangemAccount)
             InitArgs.Type.Import, InitArgs.Type.Testnet -> routeTo(InitRoute.ImportWords)
             InitArgs.Type.Signer, InitArgs.Type.SignerQR -> resolveWallets(savedState.publicKey!!)
             InitArgs.Type.Ledger -> routeTo(InitRoute.SelectAccount)
@@ -235,6 +237,13 @@ class InitViewModel(
             return true
         }
         return false
+    }
+
+    suspend fun setTangemPublicKey(tangemCardId: String, tangemPublicKey: ByteArray, publicKey: PublicKeyEd25519) {
+        resolveWallets(InitModelState.PublicKey(publicKey = publicKey))
+        savedState.publicKey = InitModelState.PublicKey(publicKey = publicKey)
+        savedState.tangemCardId = tangemCardId
+        savedState.tangemPublicKey = tangemPublicKey
     }
 
     private suspend fun resolveWallets(mnemonic: List<String>): Boolean = withContext(Dispatchers.IO) {
@@ -477,6 +486,7 @@ class InitViewModel(
                     InitArgs.Type.Import, InitArgs.Type.Testnet -> wallets.addAll(importWallet(context))
                     InitArgs.Type.Signer -> wallets.addAll(signerWallets(false))
                     InitArgs.Type.SignerQR -> wallets.addAll(signerWallets(true))
+                    InitArgs.Type.Tangem -> wallets.addAll(importTangemWallet())
                     InitArgs.Type.Ledger -> wallets.addAll(ledgerWallets())
                     InitArgs.Type.Keystone -> wallets.addAll(keystoneWallet())
                 }
@@ -558,6 +568,21 @@ class InitViewModel(
         AnalyticsHelper.trackEvent("generate_wallet", settingsRepository.installId)
         AnalyticsHelper.trackEvent("create_wallet", settingsRepository.installId)
         return wallet
+    }
+
+    private suspend fun importTangemWallet(): List<WalletEntity> {
+        val accounts = getSelectedAccounts()
+        val publicKey = savedState.publicKey ?: throw IllegalStateException("publicKey is not set")
+        val tangemCardId = savedState.tangemCardId ?: throw IllegalStateException("tangemCardId is not set")
+        val tangemPublicKey = savedState.tangemPublicKey ?: throw IllegalStateException("tangemPublicKey is not set")
+        val label = buildNewLabel(accounts.map {
+            SimpleAccount(
+                name = it.name,
+                version = it.walletVersion
+            )
+        })
+
+        return accountRepository.addTangemWallet(label, publicKey.publicKey, accounts.map { it.walletVersion }, tangemCardId, tangemPublicKey, accounts.map { it.initialized })
     }
 
     private suspend fun importWallet(context: Context): List<WalletEntity> = withContext(Dispatchers.IO) {

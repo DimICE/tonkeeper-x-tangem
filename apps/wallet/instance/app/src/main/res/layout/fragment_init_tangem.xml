@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scroll"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipToPadding="false">
+
+    <uikit.widget.ColumnLayout
+        android:id="@+id/content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="@dimen/offsetLarge">
+
+        <uikit.widget.TextHeaderView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/offsetMedium"
+            android:title="@string/tangem_wallet"
+            android:description="@string/tangem_wallet_add"/>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/offsetLarge">
+
+            <Button
+                style="@style/Widget.App.Button"
+                android:id="@+id/button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.Label1"
+                android:enabled="false"
+                android:text="@string/continue_action"/>
+            
+            <uikit.widget.LoaderView
+                android:id="@+id/loader"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:visibility="gone"/>
+
+        </FrameLayout>
+
+
+    </uikit.widget.ColumnLayout>
+
+</androidx.core.widget.NestedScrollView>
